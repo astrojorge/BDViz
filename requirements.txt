@@ -1,6 +1,5 @@
 numpy
 astropy
 matplotlib
-mpl_toolkits
 astroquery
 ipympl
