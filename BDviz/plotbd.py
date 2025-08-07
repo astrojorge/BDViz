@@ -42,19 +42,21 @@ class BrownDwarf:
 class Plot3D:
     def __init__(self): # initlize the plot
         self.objects = [] # list of objects to keep track of on the plot
+        self.artists = {} # dictionary for keeping track of object names and handles for legend
         self.fig = plt.figure(figsize=(8, 6))
         self.ax = self.fig.add_subplot(111, projection='3d')
+        lims = 1
+        self.ax.set_xlim(-lims,lims)
+        self.ax.set_ylim(-lims,lims)
+        self.ax.set_zlim(-lims,lims)
         self._setup_plot() # set up method for putting the sun, labels, and initilize viewing angle
 
     def _setup_plot(self):
-        self.ax.set_title("3D Galactic Plot (Sun at 0,0,0)")
         self.ax.set_xlabel("X (pc)")
         self.ax.set_ylabel("Y (pc)")
         self.ax.set_zlabel("Z (pc)")
-        self.ax.set_xlim(-10,10)
-        self.ax.set_ylim(-10,10)
-        self.ax.set_zlim(-10,10)
-        self.ax.scatter(0, 0, 0, color='orange', label='Sun')
+        self.ax.scatter(0, 0, 0, color='orange', label='Sun', marker = '*')
+        self.ax.text(0,0,0, f"Sun", color='orange')
         self.ax.legend()
         self.ax.view_init(elev=0, azim=125)
         plt.show()
@@ -72,14 +74,58 @@ class Plot3D:
             b = results['b']
             stars = SkyCoord(l=l, b=b, frame='galactic')
             self.ax.scatter(stars.cartesian.x, stars.cartesian.y, stars.cartesian.z, 
-                            color = 'black', alpha = 0.005, marker = ',')
+                            color = 'black', alpha = 0.005, marker = 'o', label = f'Stars from {catalog}')
+            self.ax.legend()
+
+    # function to add object to plot
         
     def add_object(self, obj, show_label=True):
         self.objects.append(obj) 
         obj.get_xyz() # get the x,y and z of object
-        self.ax.scatter(obj.x, obj.y, obj.z, color=obj.color, label=obj.name)
+        if len(self.objects) > 0:
+            lims = float(max([x.distance for x in self.objects]).value)
+            self.ax.set_xlim(-lims,lims)
+            self.ax.set_ylim(-lims,lims)
+            self.ax.set_zlim(-lims,lims)
+        scatter = self.ax.scatter(obj.x, obj.y, obj.z, color=obj.color, label=obj.name)
         if show_label:
-            self.ax.text(obj.x, obj.y, obj.z, f" {obj.name}", color=obj.color)
+            text = self.ax.text(obj.x, obj.y, obj.z, f" {obj.name}", color=obj.color)
+
+        # add the artist to the dictionary 
+        self.artists[obj.name] = [scatter]
+        if show_label:
+            self.artists[obj.name].append(text)
         self.ax.legend()
         self.fig.canvas.draw()
         print(f"Added: {obj.name} at (x={obj.x:.1f}, y={obj.y:.1f}, z={obj.z:.1f}) pc")
+
+
+    # function to remove object to plot
+    def remove_object(self,name):
+        # remove the object from the list 
+        self.objects = [obj for obj in self.objects if obj.name != name] # keep non removed ones
+        # now check for the artist and remove that one
+        if name in self.artists:
+            for artist in self.artists[name]:
+                artist.remove() # remove from dictionary
+            del self.artists[name]
+            # now fix the legend
+            self.fix_legend()
+            # redraw
+            self.fig.canvas.draw()
+            print(f'Removed: {name}!')
+
+    # legend function
+
+    def fix_legend(self):
+        handles = [] # legend handles
+        labels = [] # legend labels
+
+        for obj in self.objects:
+            if obj.name in self.artists:
+                handles.append(self.artists[obj.name][0])
+                labels.append(obj.name)
+        # now updaye the legend
+        self.ax.legend(handles, labels)
+
+
