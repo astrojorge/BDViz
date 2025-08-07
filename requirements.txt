@@ -3,3 +3,4 @@ astropy
 matplotlib
 astroquery
 ipympl
+IPython 

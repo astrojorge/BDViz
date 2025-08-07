@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "BDviz"
-version = "0.0.5"
+version = "1.0.0"
 
 dependencies = [
- "numpy","astropy", "matplotlib", "astroquery", "ipympl"
+ "numpy","astropy", "matplotlib", "astroquery", "ipympl", "IPython"
 ]

@@ -7,7 +7,7 @@ import astropy.units as u
 
 
 def get_angular_separation(object1, object2):
-	'''
+	'''Angular Separation 
 	Calulates the angular separation between
 	two objects in the scene
 
@@ -23,7 +23,7 @@ def get_angular_separation(object1, object2):
 
 
 def get_physical_separation(object1, object2):
-	'''
+	'''Physical Separation
 	Calulates the 3D distance between 
 	two objects in the scene
 
