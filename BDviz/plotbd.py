@@ -5,7 +5,7 @@ import astropy.units as u
 from astroquery.gaia import Gaia
 
 # class one, brown dwarf object
-class BrownDwarf:
+class BrownDwarf(object):
     def __init__(self, name, ra, dec, distance, color=False, temp = False):
         """
         Brown dwarf object
@@ -105,7 +105,7 @@ class Plot3D:
             obj (object) : Brown Dwarf object[?]
         """
         self.objects.append(obj) 
-        obj.get_xyz() # get the x,y and z of object
+        obj.get_xyz() # get the x,y and z of object. Note obj must have been initalized as BrownDwarf for this to work
 
         if hasattr(obj, 'temp'):
             norm = mcolors.Normalize(vmin=200, vmax=2500)
