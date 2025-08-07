@@ -6,19 +6,42 @@ import matplotlib.colors as mcolors
 import matplotlib.cm as cm
 
 class BrownDwarf(object):
-    def __init__(self, name, ra, dec, distance, color=False, temp = False):
-        """
-        Brown dwarf object
+    """Class for generating Brown Dwarf Objects
 
+        This is a class for Brown Dwarf Objects
+
+        Attributes:
+        name (str): Name of object
+
+        ra (float): RA, degrees
+
+        dec (float) : Dec, degrees
+
+        distance (float) : distance from, pc
+
+        color (str, optional) : mpl supported color to plot object 
+
+        temp (float, optional) : object temperature, K
+    """
+
+
+    def __init__(self, name, ra, dec, distance, color=False, temp = False):
+        """Brown dwarf object
+
+        This initializes a Brown Dwarf Object
+        
         Args:
             name (str): Name of object
+
             ra (float): RA, degrees
+
             dec (float) : Dec, degrees
-            distance (float) : distance from (sun/earth?), pc
+
+            distance (float) : distance from Sun, pc
             color (str, optional) : mpl supported color to plot object in
+
             temp (float, optional) : object temperature, K. 
                     Used to plot object color based on temp
-
         """
         self.name = name
         self.ra = ra * u.deg
@@ -32,24 +55,35 @@ class BrownDwarf(object):
         
         self.pos=SkyCoord(ra=self.ra,dec=self.dec, distance=self.distance,  frame='icrs')
 
-
     def get_xyz(self):
         """
-        compute galactic cartesian coordinates for object
-        [note, idk what else should go in this? no returns or args?]
+        set the x,y z attributes of the object
+
+        Args:
+            obj (object) : Brown Dwarf object
         """
-        # set set the x,y z attributes of the object
         gal=self.pos.transform_to('galactic')
         self.x = gal.cartesian.x.to(u.pc).value
         self.y = gal.cartesian.y.to(u.pc).value
         self.z = gal.cartesian.z.to(u.pc).value
 
 class Plot3D:
-    def __init__(self, plotstars = False): # initlize the plot
+    """ Plotting in 3d
+
+        Set up a 3D plotting scene
+
+        Attributes:
+
+        plotstars: bool
+
+    """
+    def __init__(self, plotstars = False):
         """
         Plotting in 3d
+
+        Args:
+            Plot3D object
         """
-        #: list : Doc comment *before* attribute, with type specified
         self.objects = [] # list of objects to keep track of on the plot
         self.artists = {} # dictionary for keeping track of object names and handles for legend
         self.fig = plt.figure(figsize=(8, 6))
@@ -61,12 +95,15 @@ class Plot3D:
         self._setup_plot() # set up method for putting the sun, labels, and initilize viewing angle
 
         if plotstars:
-            self.plot_stars() # pass catalog through here?
+            self.plot_stars()
 
     def _setup_plot(self):
-        '''
+        """
         Setup plot with axis limits and labels. Plot the Sun at (0,0,0)
-        '''
+
+        Args:
+            obj (object) : Brown Dwarf object
+        """
         self.ax.set_xlabel("X (pc)")
         self.ax.set_ylabel("Y (pc)")
         self.ax.set_zlabel("Z (pc)")
@@ -76,8 +113,9 @@ class Plot3D:
         self.ax.view_init(elev=0, azim=125)
         plt.show()
 
-    def plot_stars(self, catalog = 'Gaia'): # method for if we want to query simbad or gaia and plot stars on there
-        """ Plot selection of Milky Way stars
+    def plot_stars(self, catalog = 'Gaia'): 
+        """ 
+        Plot selection of Milky Way stars
         Args:
             catalog (str) : catalog to query stars from. Default is Gaia
         """
@@ -99,9 +137,10 @@ class Plot3D:
     # function to add object to plot
         
     def add_object(self, obj, show_label=True):
-        """ Add new object to plot. Prints object coordinates
+        """ 
+        Add new object to plot. Prints object coordinates
         Args:
-            obj (object) : Brown Dwarf object[?]
+            obj (object) : Brown Dwarf object
         """
         self.objects.append(obj) 
         obj.get_xyz() # get the x,y and z of object. Note obj must have been initialized as BrownDwarf for this to work
@@ -132,7 +171,13 @@ class Plot3D:
 
     # function to remove object from plot
     def remove_object(self,name):
-        # remove the object from the list 
+        """
+        Remove the object from the list 
+
+        Args:
+            obj (object) : Brown Dwarf object
+            name (str): Name of object
+        """
         self.objects = [obj for obj in self.objects if obj.name != name] # keep non removed ones
         # now check for the artist and remove that one
         if name in self.artists:
@@ -148,6 +193,12 @@ class Plot3D:
     # legend function
 
     def fix_legend(self):
+        """
+        Fix the legend from the 3D Plot
+
+        Args:
+            obj (object) : Brown Dwarf object
+        """
         handles = [] # legend handles
         labels = [] # legend labels
 
