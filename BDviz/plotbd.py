@@ -1,12 +1,10 @@
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 from astropy.coordinates import SkyCoord
 import astropy.units as u
 from astroquery.gaia import Gaia
 import matplotlib.colors as mcolors
 import matplotlib.cm as cm
 
-# class one, brown dwarf object
 class BrownDwarf(object):
     def __init__(self, name, ra, dec, distance, color=False, temp = False):
         """
@@ -46,7 +44,6 @@ class BrownDwarf(object):
         self.y = gal.cartesian.y.to(u.pc).value
         self.z = gal.cartesian.z.to(u.pc).value
 
-# class 2, plot 3d
 class Plot3D:
     def __init__(self, plotstars = False): # initlize the plot
         """
@@ -107,7 +104,7 @@ class Plot3D:
             obj (object) : Brown Dwarf object[?]
         """
         self.objects.append(obj) 
-        obj.get_xyz() # get the x,y and z of object. Note obj must have been initalized as BrownDwarf for this to work
+        obj.get_xyz() # get the x,y and z of object. Note obj must have been initialized as BrownDwarf for this to work
 
         if hasattr(obj, 'temp'):
             norm = mcolors.Normalize(vmin=200, vmax=2500)
@@ -133,7 +130,7 @@ class Plot3D:
         print(f"Added: {obj.name} at (x={obj.x:.1f}, y={obj.y:.1f}, z={obj.z:.1f}) pc")
 
 
-    # function to remove object to plot
+    # function to remove object from plot
     def remove_object(self,name):
         # remove the object from the list 
         self.objects = [obj for obj in self.objects if obj.name != name] # keep non removed ones
@@ -158,7 +155,7 @@ class Plot3D:
             if obj.name in self.artists:
                 handles.append(self.artists[obj.name][0])
                 labels.append(obj.name)
-        # now updaye the legend
+        # now update the legend
         self.ax.legend(handles, labels)
 
 
