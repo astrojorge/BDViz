@@ -7,17 +7,19 @@ from astroquery.gaia import Gaia
 # class one, brown dwarf object
 class BrownDwarf:
     def __init__(self, name, ra, dec, distance, color=False, temp = False):
-        ''' 
-        Brown Dwarf object
-        Attributes
-        ----------
-        ra          : float, degrees
-        dec         : float, degrees
-        distance    : float, in kpc
-        name        : string, name of object
-        color       : string, color intending to plot
-        temp        : float (optional), in K. Will plot color based on temp
-        '''
+        """
+        Brown dwarf object
+
+        Args:
+            name (str): Name of object
+            ra (float): RA, degrees
+            dec (float) : Dec, degrees
+            distance (float) : distance from (sun/earth?), pc
+            color (str, optional) : mpl supported color to plot object in
+            temp (float, optional) : object temperature, K. 
+                    Used to plot object color based on temp
+
+        """
         self.name = name
         self.ra = ra * u.deg
         self.dec = dec * u.deg
@@ -32,6 +34,10 @@ class BrownDwarf:
 
 
     def get_xyz(self):
+        """
+        compute galactic cartesian coordinates for object
+        [note, idk what else should go in this? no returns or args?]
+        """
         # set set the x,y z attributes of the object
         gal=self.pos.transform_to('galactic')
         self.x = gal.cartesian.x.to(u.pc).value
@@ -40,7 +46,11 @@ class BrownDwarf:
 
 # class 2, plot 3d
 class Plot3D:
-    def __init__(self): # initlize the plot
+    def __init__(self, plotstars = False): # initlize the plot
+        """
+        Plotting in 3d
+        """
+        #: list : Doc comment *before* attribute, with type specified
         self.objects = [] # list of objects to keep track of on the plot
         self.artists = {} # dictionary for keeping track of object names and handles for legend
         self.fig = plt.figure(figsize=(8, 6))
@@ -51,7 +61,13 @@ class Plot3D:
         self.ax.set_zlim(-lims,lims)
         self._setup_plot() # set up method for putting the sun, labels, and initilize viewing angle
 
+        if plotstars:
+            self.plot_stars() # pass catalog through here?
+
     def _setup_plot(self):
+        '''
+        Setup plot with axis limits and labels. Plot the Sun at (0,0,0)
+        '''
         self.ax.set_xlabel("X (pc)")
         self.ax.set_ylabel("Y (pc)")
         self.ax.set_zlabel("Z (pc)")
@@ -62,6 +78,10 @@ class Plot3D:
         plt.show()
 
     def plot_stars(self, catalog = 'Gaia'): # method for if we want to query simbad or gaia and plot stars on there
+        """ Plot selection of Milky Way stars
+        Args:
+            catalog (str) : catalog to query stars from. Default is Gaia
+        """
         if catalog == 'Gaia':
             query = """
                         SELECT TOP 1000 source_id, ra, dec, l, b, phot_g_mean_mag
@@ -80,8 +100,19 @@ class Plot3D:
     # function to add object to plot
         
     def add_object(self, obj, show_label=True):
+        """ Add new object to plot. Prints object coordinates
+        Args:
+            obj (object) : Brown Dwarf object[?]
+        """
         self.objects.append(obj) 
         obj.get_xyz() # get the x,y and z of object
+
+        if hasattr(obj, 'temp'):
+            norm = mcolors.Normalize(vmin=200, vmax=2500)
+            cmap = cm.Reds
+            color = cmap(norm(obj.temp))
+            obj.color = color
+
         if len(self.objects) > 0:
             lims = float(max([x.distance for x in self.objects]).value)
             self.ax.set_xlim(-lims,lims)
