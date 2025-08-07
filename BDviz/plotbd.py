@@ -4,6 +4,7 @@ import astropy.units as u
 from astroquery.gaia import Gaia
 import matplotlib.colors as mcolors
 import matplotlib.cm as cm
+from IPython.display import display
 
 class BrownDwarf(object):
     """Class for generating Brown Dwarf Objects
@@ -111,7 +112,15 @@ class Plot3D:
         self.ax.text(0,0,0, f"Sun", color='orange')
         self.ax.legend()
         self.ax.view_init(elev=0, azim=125)
-        plt.show()
+
+
+    def show(self):
+        """Displays the interactive plot (in Jupyter)
+
+        Args:
+            obj (object): Brown Dwarf object
+        """
+        display(self.fig)
 
     def plot_stars(self, catalog = 'Gaia'): 
         """ 
