@@ -42,6 +42,7 @@ class BrownDwarf:
 class Plot3D:
     def __init__(self): # initlize the plot
         self.objects = [] # list of objects to keep track of on the plot
+        self.artists = {} # dictionary for keeping track of object names and handles for legend
         self.fig = plt.figure(figsize=(8, 6))
         self.ax = self.fig.add_subplot(111, projection='3d')
         lims = 1
@@ -75,6 +76,8 @@ class Plot3D:
             self.ax.scatter(stars.cartesian.x, stars.cartesian.y, stars.cartesian.z, 
                             color = 'black', alpha = 0.005, marker = 'o', label = f'Stars from {catalog}')
             self.ax.legend()
+
+    # function to add object to plot
         
     def add_object(self, obj, show_label=True):
         self.objects.append(obj) 
@@ -84,15 +87,45 @@ class Plot3D:
             self.ax.set_xlim(-lims,lims)
             self.ax.set_ylim(-lims,lims)
             self.ax.set_zlim(-lims,lims)
-        self.ax.scatter(obj.x, obj.y, obj.z, color=obj.color, label=obj.name)
+        scatter = self.ax.scatter(obj.x, obj.y, obj.z, color=obj.color, label=obj.name)
         if show_label:
-            self.ax.text(obj.x, obj.y, obj.z, f" {obj.name}", color=obj.color)
+            text = self.ax.text(obj.x, obj.y, obj.z, f" {obj.name}", color=obj.color)
+
+        # add the artist to the dictionary 
+        self.artists[obj.name] = [scatter]
+        if show_label:
+            self.artists[obj.name].append(text)
         self.ax.legend()
         self.fig.canvas.draw()
         print(f"Added: {obj.name} at (x={obj.x:.1f}, y={obj.y:.1f}, z={obj.z:.1f}) pc")
 
 
-
+    # function to remove object to plot
     def remove_object(self,name):
-        
+        # remove the object from the list 
+        self.objects = [obj for obj in self.objects if obj.name != name] # keep non removed ones
+        # now check for the artist and remove that one
+        if name in self.artists:
+            for artist in self.artists[name]:
+                artist.remove() # remove from dictionary
+            del self.artists[name]
+            # now fix the legend
+            self.fix_legend()
+            # redraw
+            self.fig.canvas.draw()
+            print(f'Removed: {name}!')
+
+    # legend function
+
+    def fix_legend(self):
+        handles = [] # legend handles
+        labels = [] # legend labels
+
+        for obj in self.objects:
+            if obj.name in self.artists:
+                handles.append(self.artists[obj.name][0])
+                labels.append(obj.name)
+        # now updaye the legend
+        self.ax.legend(handles, labels)
+
 
