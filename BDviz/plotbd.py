@@ -47,14 +47,13 @@ class Plot3D:
         self._setup_plot() # set up method for putting the sun, labels, and initilize viewing angle
 
     def _setup_plot(self):
-        self.ax.set_title("3D Galactic Plot (Sun at 0,0,0)")
         self.ax.set_xlabel("X (pc)")
         self.ax.set_ylabel("Y (pc)")
         self.ax.set_zlabel("Z (pc)")
         self.ax.set_xlim(-10,10)
         self.ax.set_ylim(-10,10)
         self.ax.set_zlim(-10,10)
-        self.ax.scatter(0, 0, 0, color='orange', label='Sun')
+        self.ax.scatter(0, 0, 0, color='orange', label='Sun', marker = '*')
         self.ax.legend()
         self.ax.view_init(elev=0, azim=125)
         plt.show()
@@ -72,7 +71,8 @@ class Plot3D:
             b = results['b']
             stars = SkyCoord(l=l, b=b, frame='galactic')
             self.ax.scatter(stars.cartesian.x, stars.cartesian.y, stars.cartesian.z, 
-                            color = 'black', alpha = 0.005, marker = ',')
+                            color = 'black', alpha = 0.005, marker = 'o', label = f'Stars from {catalog}')
+            self.ax.legend()
         
     def add_object(self, obj, show_label=True):
         self.objects.append(obj) 
