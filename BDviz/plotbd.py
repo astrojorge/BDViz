@@ -90,3 +90,9 @@ class Plot3D:
         self.ax.legend()
         self.fig.canvas.draw()
         print(f"Added: {obj.name} at (x={obj.x:.1f}, y={obj.y:.1f}, z={obj.z:.1f}) pc")
+
+
+
+    def remove_object(self,name):
+        
+
