@@ -3,6 +3,8 @@ from mpl_toolkits.mplot3d import Axes3D
 from astropy.coordinates import SkyCoord
 import astropy.units as u
 from astroquery.gaia import Gaia
+import matplotlib.colors as mcolors
+import matplotlib.cm as cm
 
 # class one, brown dwarf object
 class BrownDwarf(object):
