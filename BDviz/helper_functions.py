@@ -19,7 +19,7 @@ def get_angular_separation(object1, object2):
 		astropy.coordinates.Angle: separation of objects in degrees
 	'''
 
-	return object1.pos.separation(object2.pos)
+	return object1.pos.separation(object2.pos).to(u.deg)
 
 
 def get_physical_separation(object1, object2):

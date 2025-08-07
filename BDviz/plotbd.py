@@ -44,16 +44,18 @@ class Plot3D:
         self.objects = [] # list of objects to keep track of on the plot
         self.fig = plt.figure(figsize=(8, 6))
         self.ax = self.fig.add_subplot(111, projection='3d')
+        lims = 1
+        self.ax.set_xlim(-lims,lims)
+        self.ax.set_ylim(-lims,lims)
+        self.ax.set_zlim(-lims,lims)
         self._setup_plot() # set up method for putting the sun, labels, and initilize viewing angle
 
     def _setup_plot(self):
         self.ax.set_xlabel("X (pc)")
         self.ax.set_ylabel("Y (pc)")
         self.ax.set_zlabel("Z (pc)")
-        self.ax.set_xlim(-10,10)
-        self.ax.set_ylim(-10,10)
-        self.ax.set_zlim(-10,10)
         self.ax.scatter(0, 0, 0, color='orange', label='Sun', marker = '*')
+        self.ax.text(0,0,0, f"Sun", color='orange')
         self.ax.legend()
         self.ax.view_init(elev=0, azim=125)
         plt.show()
@@ -77,6 +79,11 @@ class Plot3D:
     def add_object(self, obj, show_label=True):
         self.objects.append(obj) 
         obj.get_xyz() # get the x,y and z of object
+        if len(self.objects) > 0:
+            lims = float(max([x.distance for x in self.objects]).value)
+            self.ax.set_xlim(-lims,lims)
+            self.ax.set_ylim(-lims,lims)
+            self.ax.set_zlim(-lims,lims)
         self.ax.scatter(obj.x, obj.y, obj.z, color=obj.color, label=obj.name)
         if show_label:
             self.ax.text(obj.x, obj.y, obj.z, f" {obj.name}", color=obj.color)
