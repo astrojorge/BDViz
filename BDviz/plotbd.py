@@ -57,6 +57,7 @@ class Plot3D:
         self.ax.scatter(0, 0, 0, color='orange', label='Sun')
         self.ax.legend()
         self.ax.view_init(elev=0, azim=125)
+        plt.show()
 
     def plot_stars(self, catalog = 'Gaia'): # method for if we want to query simbad or gaia and plot stars on there
         if catalog == 'Gaia':
