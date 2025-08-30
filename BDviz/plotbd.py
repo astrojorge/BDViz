@@ -78,7 +78,7 @@ class Plot3D:
         plotstars: bool
 
     """
-    def __init__(self, plotstars = False):
+    def __init__(self, plotstars = False, **kwargs):
         """
         Plotting in 3d
 
@@ -94,6 +94,7 @@ class Plot3D:
         self.ax.set_ylim(-lims,lims)
         self.ax.set_zlim(-lims,lims)
         self._setup_plot() # set up method for putting the sun, labels, and initilize viewing angle
+        self.kwargs = kwargs
 
         if plotstars:
             self.plot_stars()
@@ -122,26 +123,15 @@ class Plot3D:
         """
         display(self.fig)
 
-    def plot_stars(self, catalog = 'Gaia'): 
+    def plot_stars(self, results): 
         """ 
         Plot selection of Milky Way stars
         Args:
-            catalog (str) : catalog to query stars from. Default is Gaia
+            results (Table) : table provided from gaia astroquery
+            catalog (str)   : catalog to query stars from. Default is Gaia
         """
-        if catalog == 'Gaia':
-            query = """
-                        SELECT TOP 1000 source_id, ra, dec, l, b, phot_g_mean_mag
-                        FROM gaiadr3.gaia_source
-                        WHERE phot_g_mean_mag < 12
-                        """
-            job = Gaia.launch_job_async(query)
-            results = job.get_results()
-            l = results['l']
-            b = results['b']
-            stars = SkyCoord(l=l, b=b, frame='galactic')
-            self.ax.scatter(stars.cartesian.x, stars.cartesian.y, stars.cartesian.z, 
-                            color = 'black', alpha = 0.005, marker = 'o', label = f'Stars from {catalog}')
-            self.ax.legend()
+        plot = PlotStars(self.ax)
+        plot.plot_stars(results)
 
     # function to add object to plot
         
@@ -219,3 +209,32 @@ class Plot3D:
         self.ax.legend(handles, labels)
 
 
+class PlotStars():
+    """ Plotting stars from Gaia
+
+        Plotting stars from an inputed Gaia query.
+
+        Attributes:
+    """
+    def __init__(self,ax):
+        '''
+        Add stars to active plot.add_object
+
+        Args:
+            Plot3D object
+        '''
+        self.ax = ax
+        # self.kwargs = kwargs
+
+    def plot_stars(self, results): 
+        """ 
+        Plot selection of Milky Way stars. Current capabilities only for Gaia catalog.
+        Args:
+            results (Table) : results of Gaia query job
+        """
+        l = results['l']
+        b = results['b']
+        stars = SkyCoord(l=l, b=b, frame='galactic')
+        self.ax.scatter(stars.cartesian.x, stars.cartesian.y, stars.cartesian.z, 
+                        color = 'black', marker = 'o', label = f'Stars from Gaia', alpha = 0.5)
+        self.ax.legend()
